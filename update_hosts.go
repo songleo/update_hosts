@@ -29,10 +29,6 @@ func main() {
 		re   *regexp.Regexp
 		err  error
 	)
-	thanks := `This program is dependent on the following two blogs,Thank you for provide hosts information website!
-http://blog.my-eclipse.cn/
-http://www.findspace.name/
-`
 
 	urlList := []string{
 		"http://googleips-google.stor.sinaapp.com/hosts",
@@ -48,7 +44,6 @@ http://www.findspace.name/
 		defer resp.Body.Close()
 
 		if resp.StatusCode == http.StatusOK {
-			fmt.Println(thanks)
 			fmt.Println("Update your hosts......")
 			break
 		} else {
