@@ -1,7 +1,13 @@
 # update_hosts
 
-Update the hosts file to Google, hosts url is provided by the following websites:
+update the hosts file to google, hosts info is provided by the following websites:
 		
 - http://www.findspace.name/
 
 - http://blog.my-eclipse.cn/ 
+
+
+hosts location:
+
+- Linux:**/etc/hosts**
+- Windows:**C:\Windows\System32\drivers\etc\hosts**
