@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	//"regexp/syntax"
 	"runtime"
 )
 
@@ -17,10 +16,8 @@ var Log = fmt.Println
 func init() {
 	if runtime.GOOS == "windows" {
 		hostsFile = "C:\\Windows\\System32\\drivers\\etc\\hosts"
-		fmt.Println("OS is Windows\nhosts:", hostsFile)
 	} else {
 		hostsFile = "/etc/hosts"
-		fmt.Println("OS is Linux!\nhosts:", hostsFile)
 	}
 
 }
@@ -32,6 +29,10 @@ func main() {
 		re   *regexp.Regexp
 		err  error
 	)
+	thanks := `This program is dependent on the following two blogs,Thank you for provide hosts information website!
+http://blog.my-eclipse.cn/
+http://www.findspace.name/
+`
 
 	urlList := []string{
 		"http://googleips-google.stor.sinaapp.com/hosts",
@@ -47,7 +48,8 @@ func main() {
 		defer resp.Body.Close()
 
 		if resp.StatusCode == http.StatusOK {
-			fmt.Println("OK, update your hosts......")
+			fmt.Println(thanks)
+			fmt.Println("Update your hosts......")
 			break
 		} else {
 			continue
@@ -55,7 +57,7 @@ func main() {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Sorry :(\nUpdate your hosts fail, the program will exit.\n")
+		fmt.Println("Sorry :(\nUpdate your hosts fail, program will exit.\n")
 		os.Exit(-1)
 	}
 	hosts, err := ioutil.ReadFile(hostsFile)
@@ -87,4 +89,6 @@ func main() {
 		}
 		file.WriteString(string(buf[:numBytes]))
 	}
+	fmt.Println("\nUpdate the hosts success, press ENTER to exit!")
+	fmt.Scanln()
 }
