@@ -11,7 +11,6 @@ import (
 )
 
 var hostsFile string
-var Log = fmt.Println
 
 func init() {
 	if runtime.GOOS == "windows" {
@@ -19,7 +18,6 @@ func init() {
 	} else {
 		hostsFile = "/etc/hosts"
 	}
-
 }
 
 func main() {
