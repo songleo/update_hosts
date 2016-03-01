@@ -31,6 +31,7 @@ func main() {
 	urlList := []string{
 		"http://googleips-google.stor.sinaapp.com/hosts",
 		"http://blog.my-eclipse.cn/hosts.txt",
+		"https://github.com/racaljk/hosts/blob/master/hosts",
 	}
 
 	for _, url := range urlList {
