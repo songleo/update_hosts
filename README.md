@@ -6,6 +6,8 @@ update the hosts file to google, hosts info is provided by the following website
 
 - http://blog.my-eclipse.cn/ 
 
+- http://laod.cn/
+
 
 hosts location:
 
