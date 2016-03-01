@@ -29,7 +29,7 @@ func main() {
 	)
 
 	urlList := []string{
-		"https://github.com/racaljk/hosts/blob/master/hosts",
+		"https://raw.githubusercontent.com/racaljk/hosts/master/hosts",
 		"http://googleips-google.stor.sinaapp.com/hosts",
 		"http://blog.my-eclipse.cn/hosts.txt",
 	}
