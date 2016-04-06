@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -29,18 +28,18 @@ func main() {
 	)
 
 	urlList := []string{
-		"https://raw.githubusercontent.com/racaljk/hosts/master/hosts",
-		"http://googleips-google.stor.sinaapp.com/hosts",
+		"http://googlehosts-hostsfiles.stor.sinaapp.com/hosts",
 		"http://blog.my-eclipse.cn/hosts.txt",
+		"https://raw.githubusercontent.com/racaljk/hosts/master/hosts",
+		"http://gcat.gq/wp-content/uploads/2016/04/201604040806092.txt",
 	}
 
 	for _, url := range urlList {
 
 		resp, err = http.Get(url)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
-		defer resp.Body.Close()
 
 		if resp.StatusCode == http.StatusOK {
 			fmt.Println("Update your hosts......")
@@ -54,35 +53,43 @@ func main() {
 		fmt.Println("Sorry :(\nUpdate your hosts fail, program will exit.\n")
 		os.Exit(-1)
 	}
-	hosts, err := ioutil.ReadFile(hostsFile)
-	hostsContext := string(hosts)
+
+	oldHosts, err := ioutil.ReadFile(hostsFile)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
+
+	oldHostsContext := string(oldHosts)
 	var pat = "(?s)#old hosts start.*#old hosts end"
 
 	re, _ = regexp.Compile(pat)
-	oldStr := re.FindAllStringSubmatch(string(hostsContext), -1)
+	oldStr := re.FindAllStringSubmatch(string(oldHostsContext), -1)
 	if len(oldStr) == 0 {
-		hostsContext = "\n#old hosts start\n" + hostsContext + "\n#old hosts end\n"
+		oldHostsContext = "\n#old hosts start\n" + oldHostsContext + "\n#old hosts end\n"
 	} else {
-		hostsContext = oldStr[0][0]
+		oldHostsContext = oldStr[0][0]
 	}
 
 	file, err := os.OpenFile(hostsFile, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(-1)
 	}
 	defer file.Close()
 
-	file.WriteString(hostsContext)
+	file.WriteString(oldHostsContext)
 	file.WriteString("\n \n")
 
-	buf := make([]byte, 10240)
-	for {
-		numBytes, _ := resp.Body.Read(buf)
-		if numBytes == 0 {
-			break
-		}
-		file.WriteString(string(buf[:numBytes]))
+	newHosts, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
 	}
+
+	file.WriteString(string(newHosts))
 	fmt.Println("\nUpdate the hosts success, press ENTER to exit!")
+
+	resp.Body.Close()
 	fmt.Scanln()
 }
