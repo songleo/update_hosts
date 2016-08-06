@@ -9,23 +9,21 @@ import (
 	"runtime"
 )
 
-var hostsFile string
-
-func init() {
-	if runtime.GOOS == "windows" {
-		hostsFile = "C:\\Windows\\System32\\drivers\\etc\\hosts"
-	} else {
-		hostsFile = "/etc/hosts"
-	}
-}
-
 func main() {
 
 	var (
-		resp *http.Response
-		re   *regexp.Regexp
-		err  error
+		resp  *http.Response
+		re    *regexp.Regexp
+		err   error
+		hosts string
 	)
+
+	// check OS type
+	if runtime.GOOS == "windows" {
+		hosts = "C:/Windows/System32/drivers/etc/hosts"
+	} else {
+		hosts = "/etc/hosts"
+	}
 
 	urlList := []string{
 		"http://googlehosts-hostsfiles.stor.sinaapp.com/hosts",
@@ -34,15 +32,15 @@ func main() {
 		"http://gcat.gq/wp-content/uploads/2016/04/201604040806092.txt",
 	}
 
+	// search for available hosts url
 	for _, url := range urlList {
-
 		resp, err = http.Get(url)
 		if err != nil {
 			fmt.Println(err)
 		}
 
 		if resp.StatusCode == http.StatusOK {
-			fmt.Println("Update your hosts......")
+			fmt.Println("update hosts......")
 			break
 		} else {
 			continue
@@ -50,35 +48,35 @@ func main() {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Sorry :(\nUpdate your hosts fail, program will exit.\n")
+		fmt.Println("sorry :(\nfail to update hosts, exit.\n")
 		os.Exit(-1)
 	}
 
-	oldHosts, err := ioutil.ReadFile(hostsFile)
+	fileBuf, err := ioutil.ReadFile(hosts)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
 
-	oldHostsContext := string(oldHosts)
 	var pat = "(?s)#old hosts start.*#old hosts end"
-
 	re, _ = regexp.Compile(pat)
-	oldStr := re.FindAllStringSubmatch(string(oldHostsContext), -1)
-	if len(oldStr) == 0 {
-		oldHostsContext = "\n#old hosts start\n" + oldHostsContext + "\n#old hosts end\n"
+
+	oldHosts := string(fileBuf)
+	findResult := re.FindAllStringSubmatch(oldHosts, -1)
+	if len(findResult) == 0 {
+		oldHosts = "\n#old hosts start\n" + oldHosts + "\n#old hosts end\n"
 	} else {
-		oldHostsContext = oldStr[0][0]
+		oldHosts = findResult[0][0]
 	}
 
-	file, err := os.OpenFile(hostsFile, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	file, err := os.OpenFile(hosts, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
 	defer file.Close()
 
-	file.WriteString(oldHostsContext)
+	file.WriteString(oldHosts)
 	file.WriteString("\n \n")
 
 	newHosts, err := ioutil.ReadAll(resp.Body)
@@ -86,10 +84,10 @@ func main() {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
+	resp.Body.Close()
 
 	file.WriteString(string(newHosts))
-	fmt.Println("\nUpdate the hosts success, press ENTER to exit!")
 
-	resp.Body.Close()
+	fmt.Println("\nupdate the hosts success, press ENTER to exit.")
 	fmt.Scanln()
 }
