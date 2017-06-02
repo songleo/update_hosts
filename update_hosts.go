@@ -1,12 +1,21 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"runtime"
+)
+
+func init() {
+	flag.Parse()
+}
+
+var (
+	hostsURL = flag.String("url", "", "specify hosts url")
 )
 
 func main() {
@@ -30,6 +39,10 @@ func main() {
 		"http://blog.my-eclipse.cn/hosts.txt",
 		"https://raw.githubusercontent.com/racaljk/hosts/master/hosts",
 		"http://gcat.gq/wp-content/uploads/2016/04/201604040806092.txt",
+	}
+
+	if len(*hostsURL) > 0 {
+		urlList = append(urlList, *hostsURL)
 	}
 
 	// search for available hosts url
